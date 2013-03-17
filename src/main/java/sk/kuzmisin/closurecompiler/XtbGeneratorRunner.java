@@ -16,6 +16,7 @@ class XtbGeneratorRunner {
         options.addOption("lang", true, "Lang");
         options.addOption("js", true, "Input JS file");
         options.addOption("translations_file", true, "XTB translation file");
+        options.addOption("xtb_output_file", true, "XTB output file");
     }
 
     public static void main(String[] args) throws IOException {
@@ -45,6 +46,7 @@ class XtbGeneratorRunner {
             final String projectId = line.getOptionValue("projectId");
             final String lang = line.getOptionValue("lang");
             final String translationFile = line.getOptionValue("translations_file");
+            final String xtbOutputFile = line.getOptionValue("xtb_output_file");
 
             if (lang == null) {
                 usage("lang cannot be empty");
@@ -53,7 +55,7 @@ class XtbGeneratorRunner {
                 usage("no JS file(s) to parse ...");
 
             } else {
-                XtbGenerator.process(lang, projectId, jsFiles, translationFile);
+                XtbGenerator.process(lang, projectId, jsFiles, translationFile, xtbOutputFile);
             }
 
         } catch (ParseException e) {
@@ -71,6 +73,7 @@ class XtbGeneratorRunner {
         System.out.println("\t--projectId" + options.getOption("projectId").getDescription());
         System.out.println("\t--js\t" + options.getOption("js").getDescription());
         System.out.println("\t--translations_file\t" + options.getOption("translations_file").getDescription());
+        System.out.println("\t--xtb_output_file\t" + options.getOption("xtb_output_file").getDescription());
 
         if (errorMessage != null) {
             System.out.println();

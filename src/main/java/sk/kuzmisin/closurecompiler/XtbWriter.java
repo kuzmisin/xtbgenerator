@@ -7,7 +7,7 @@ import java.io.Writer;
 import java.util.Iterator;
 import java.util.Map;
 
-public class XtbWriter {
+abstract class XtbWriter {
 
     protected final String EOL = "\n";
 
@@ -17,12 +17,21 @@ public class XtbWriter {
 
     protected Map<String, JsMessage> messages;
 
-    public XtbWriter(Writer writer, Map<String, JsMessage> messages) {
+    protected String lang;
+
+    public XtbWriter(Writer writer, String lang, Map<String, JsMessage> messages) {
         this.writer = writer;
         this.messages = messages;
+        this.lang = lang;
     }
 
-    public void write() throws IOException {
+    abstract public void write() throws IOException;
+
+    protected void writeFooter() throws IOException {
+        writer.append("</translationbundle>");
+    }
+
+    protected void writeMessages() throws IOException {
         Iterator<JsMessage> iterator = messages.values().iterator();
         while (iterator.hasNext()) {
             JsMessage message = iterator.next();
@@ -31,7 +40,7 @@ public class XtbWriter {
                 "<translation id=\"" + message.getId() + "\" " +
                         "key=\"" + message.getKey() + "\" " +
                         "source=\"" + message.getSourceName() + "\" " +
-                        "desc=\"" + message.getDesc() + "\"" +
+                        "desc=\"" + escapeDesc(message.getDesc()) + "\"" +
                         ">"
             );
 
@@ -48,7 +57,6 @@ public class XtbWriter {
                 EOL
             );
         }
-        writer.flush();
     }
 
     protected String escape(CharSequence value) {
@@ -56,5 +64,9 @@ public class XtbWriter {
             replace("&", "&amp;").
             replace("<", "&lt;").
             replace(">", "&gt;");
+    }
+
+    protected String escapeDesc(CharSequence value) {
+        return value.toString().replace("\"", "&quot;");
     }
 }

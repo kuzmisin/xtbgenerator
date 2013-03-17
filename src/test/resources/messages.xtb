@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE translationbundle>
+<translationbundle lang="cs">
+	<translation id="2426017083238799036" key="MSG_TEST_1" source="messages.js" desc="Description for Test 1">Test 1</translation>
+	<translation id="4621514753271441478" key="MSG_TEST_2" source="messages.js" desc="Description for Test 2 with placeholders">Test 1 <ph name="ph1" /> and <ph name="ph2" /></translation>
+	<translation id="3944534681643344567" key="MSG_TEST_3" source="messages.js" desc="Description for Test 3 with multi line description">Test 3</translation>
+	<translation id="8689970563259150743" key="MSG_TEST_4" source="messages.js" desc="Description for Test 4 HTML">Test 4 &lt;br /&gt; new HTML line</translation>
+</translationbundle>

@@ -4,15 +4,30 @@ import com.google.javascript.jscomp.GoogleJsMessageIdGenerator;
 import com.google.javascript.jscomp.JsMessage;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 
 public class XtbWriterTest {
+    /**
+     * Mock XtbWriter
+     */
+    class MockXtbWriter extends XtbWriter {
+
+        public MockXtbWriter(Writer writer, String lang, Map<String, JsMessage> messages) {
+            super(writer, lang, messages);
+        }
+
+        @Override
+        public void write() throws IOException {};
+    }
+
     @Test
-    public void testWrite() throws Exception {
+    public void testWriteMessages() throws Exception {
         Map<String, JsMessage> messages = new HashMap<>();
         GoogleJsMessageIdGenerator idGenerator = new GoogleJsMessageIdGenerator(null);
 
@@ -38,18 +53,18 @@ public class XtbWriterTest {
         );
 
         messages.put(
-                "DUMMY_ID_3",
-                new JsMessage.Builder("MSG_TEST_3").
-                        appendStringPart("HTML <> &").
-                        setDesc("Description 3").
-                        setSourceName("file.js").
-                        build(idGenerator)
+            "DUMMY_ID_3",
+            new JsMessage.Builder("MSG_TEST_3").
+                    appendStringPart("HTML <> &").
+                    setDesc("Description 3").
+                    setSourceName("file.js").
+                    build(idGenerator)
         );
 
         StringWriter writer = new StringWriter();
 
-        XtbWriter xtbWriter = new XtbWriter(writer, messages);
-        xtbWriter.write();
+        final MockXtbWriter xtbWriter = new MockXtbWriter(writer, "cs", messages);
+        xtbWriter.writeMessages();
 
         final String expected =
                 "\t<translation id=\"2426017083238799036\" key=\"MSG_TEST_1\" source=\"file.js\" desc=\"Description 1\">Test 1</translation>\n" +

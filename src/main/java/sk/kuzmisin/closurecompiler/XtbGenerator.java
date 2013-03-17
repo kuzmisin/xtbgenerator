@@ -1,14 +1,8 @@
 package sk.kuzmisin.closurecompiler;
 
-import com.google.javascript.jscomp.GoogleJsMessageIdGenerator;
-import com.google.javascript.jscomp.JsMessage;
-import com.google.javascript.jscomp.JsMessageExtractor;
-import com.google.javascript.jscomp.SourceFile;
+import com.google.javascript.jscomp.*;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -24,12 +18,17 @@ public class XtbGenerator {
 
     protected String translationFile;
 
-    public static void process(String lang, String projectId, Collection<SourceFile> jsFiles, String translationFile) throws IOException {
+    protected String xtbOutputFile;
+
+    public static void process(String lang, String projectId, Collection<SourceFile> jsFiles, String translationFile, String xtbOutputFile)
+            throws IOException {
+
         final XtbGenerator xtbGenerator = new XtbGenerator();
         xtbGenerator.setLang(lang);
         xtbGenerator.setProjectId(projectId);
         xtbGenerator.setJsFile(jsFiles);
         xtbGenerator.setTranslationFile(translationFile);
+        xtbGenerator.setXtbOutputFile(xtbOutputFile);
 
         xtbGenerator.run();
     }
@@ -50,14 +49,45 @@ public class XtbGenerator {
         this.translationFile = translationFile;
     }
 
-    public void run() throws IOException {
-        final XtbWriter xtbWriter = new XtbWriter(new OutputStreamWriter(System.out), getMessagesFromJs());
-        xtbWriter.write();
+    public void setXtbOutputFile(String xtbOutputFile) {
+        this.xtbOutputFile = xtbOutputFile;
     }
 
-    /**
-     * Return messages in MAP <id, JsMessage>
-     */
+    public void run() throws IOException {
+        Writer writer = getOutputWriter();
+        XtbWriter xtbWriter;
+
+        if (translationFile == null) {
+            xtbWriter = new XtbWriterEmpty(writer, lang, getMessages());
+
+        } else {
+            xtbWriter = new XtbWriterAppend(writer, lang, getMessages(), getTranslationFileContent());
+        }
+
+        xtbWriter.write();
+        writer.close();
+    }
+
+    public Map<String, JsMessage> getMessages() throws IOException {
+        final Map<String, JsMessage> jsMessages = getMessagesFromJs();
+        XtbMessageBundle xtbMessageBundle = getMessageBundleFromTranslationFile();
+        if (xtbMessageBundle == null) {
+            return jsMessages;
+        }
+
+        final Map<String, JsMessage> messages = new LinkedHashMap<>();
+        final Iterator<String> jsMessagesIterator = jsMessages.keySet().iterator();
+
+        while (jsMessagesIterator.hasNext()) {
+            final String messageId = jsMessagesIterator.next();
+            if (xtbMessageBundle.getMessage(messageId) == null) {
+                messages.put(messageId, jsMessages.get(messageId));
+            }
+        }
+
+        return messages;
+    }
+
     public Map<String, JsMessage> getMessagesFromJs() throws IOException {
         final JsMessageExtractor extractor = new JsMessageExtractor(
                 new GoogleJsMessageIdGenerator(projectId), JsMessage.Style.CLOSURE
@@ -66,7 +96,7 @@ public class XtbGenerator {
         final Collection<JsMessage> messages = extractor.extractMessages(jsFiles);
         final Iterator<JsMessage> iterator = messages.iterator();
 
-        Map<String, JsMessage> messageMap = new LinkedHashMap<>();
+        final Map<String, JsMessage> messageMap = new LinkedHashMap<>();
 
         while (iterator.hasNext()) {
             JsMessage message = iterator.next();
@@ -74,5 +104,43 @@ public class XtbGenerator {
         }
 
         return messageMap;
+    }
+
+    public XtbMessageBundle getMessageBundleFromTranslationFile() throws IOException {
+        InputStream translationInputStream = getTranslationFileInputStream();
+        if (translationInputStream == null) {
+            return null;
+        }
+
+        final XtbMessageBundle xtbMessageBundle = new XtbMessageBundle(translationInputStream, projectId);
+        translationInputStream.close();
+
+        return xtbMessageBundle;
+    }
+
+    protected String getTranslationFileContent() throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(getTranslationFileInputStream()));
+        StringBuilder content = new StringBuilder();
+
+        char[] buffer = new char[512];
+        int l;
+
+        while ((l = reader.read(buffer)) > 0) {
+            content.append(buffer, 0, l);
+        }
+
+        reader.close();
+        return content.toString();
+    }
+
+    protected InputStream getTranslationFileInputStream() throws FileNotFoundException {
+        if (translationFile == null) {
+            return null;
+        }
+        return new FileInputStream(translationFile);
+    }
+
+    protected Writer getOutputWriter() {
+        return new OutputStreamWriter(System.out); // TODO
     }
 }
