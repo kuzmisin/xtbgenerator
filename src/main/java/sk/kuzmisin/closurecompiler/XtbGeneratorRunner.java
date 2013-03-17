@@ -69,11 +69,11 @@ class XtbGeneratorRunner {
         System.out.println();
 
         System.out.println("Params:");
-        System.out.println("\t--lang\t" + options.getOption("lang").getDescription());
-        System.out.println("\t--projectId" + options.getOption("projectId").getDescription());
-        System.out.println("\t--js\t" + options.getOption("js").getDescription());
-        System.out.println("\t--translations_file\t" + options.getOption("translations_file").getDescription());
-        System.out.println("\t--xtb_output_file\t" + options.getOption("xtb_output_file").getDescription());
+        System.out.println("\t--lang\t\t\t: " + options.getOption("lang").getDescription());
+        System.out.println("\t--projectId\t\t: " + options.getOption("projectId").getDescription());
+        System.out.println("\t--js\t\t\t: " + options.getOption("js").getDescription());
+        System.out.println("\t--translations_file\t: " + options.getOption("translations_file").getDescription());
+        System.out.println("\t--xtb_output_file\t: " + options.getOption("xtb_output_file").getDescription());
 
         if (errorMessage != null) {
             System.out.println();

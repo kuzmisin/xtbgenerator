@@ -54,14 +54,20 @@ public class XtbGenerator {
     }
 
     public void run() throws IOException {
-        Writer writer = getOutputWriter();
+        // process messages
+        Map<String, JsMessage> messages = getMessages();
+        String translationContent = getTranslationFileContent();
+
+        // XtbWriter (append/empty)
         XtbWriter xtbWriter;
 
-        if (translationFile == null) {
-            xtbWriter = new XtbWriterEmpty(writer, lang, getMessages());
+        // get(create) output writer
+        Writer writer = getOutputWriter();
 
+        if (translationContent == null) {
+            xtbWriter = new XtbWriterEmpty(writer, lang, messages);
         } else {
-            xtbWriter = new XtbWriterAppend(writer, lang, getMessages(), getTranslationFileContent());
+            xtbWriter = new XtbWriterAppend(writer, lang, messages, translationContent);
         }
 
         xtbWriter.write();
@@ -119,7 +125,11 @@ public class XtbGenerator {
     }
 
     protected String getTranslationFileContent() throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(getTranslationFileInputStream()));
+        InputStream translationInputStream = getTranslationFileInputStream();
+        if (translationInputStream == null) {
+            return null;
+        }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(translationInputStream));
         StringBuilder content = new StringBuilder();
 
         char[] buffer = new char[512];
@@ -137,10 +147,21 @@ public class XtbGenerator {
         if (translationFile == null) {
             return null;
         }
-        return new FileInputStream(translationFile);
+        File inFile = new File(translationFile);
+        if (!inFile.exists()) {
+            return null;
+        }
+        return new FileInputStream(inFile);
     }
 
-    protected Writer getOutputWriter() {
-        return new OutputStreamWriter(System.out); // TODO
+    protected Writer getOutputWriter() throws IOException {
+        if (xtbOutputFile == null) {
+            return new OutputStreamWriter(System.out);
+        }
+        File outFile = new File(xtbOutputFile);
+        if (!outFile.exists()) {
+            outFile.createNewFile();
+        }
+        return new OutputStreamWriter(new FileOutputStream(outFile));
     }
 }
