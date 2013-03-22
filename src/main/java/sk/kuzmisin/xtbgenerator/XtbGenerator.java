@@ -1,4 +1,4 @@
-package sk.kuzmisin.closurecompiler;
+package sk.kuzmisin.xtbgenerator;
 
 import com.google.javascript.jscomp.*;
 
