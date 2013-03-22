@@ -54,24 +54,32 @@ public class XtbGenerator {
     }
 
     public void run() throws IOException {
-        // process messages
-        Map<String, JsMessage> messages = getMessages();
-        String translationContent = getTranslationFileContent();
+        Writer outputWriter = null;
 
-        // XtbWriter (append/empty)
-        XtbWriter xtbWriter;
+        try {
+            // process messages
+            Map<String, JsMessage> messages = getMessages();
+            String translationContent = getTranslationFileContent();
 
-        // get(create) output writer
-        Writer writer = getOutputWriter();
+            // XtbWriter (append/empty)
+            XtbWriter xtbWriter;
 
-        if (translationContent == null) {
-            xtbWriter = new XtbWriterEmpty(writer, lang, messages);
-        } else {
-            xtbWriter = new XtbWriterAppend(writer, lang, messages, translationContent);
+            // get(create) output writer
+            outputWriter = getOutputWriter();
+
+            if (translationContent == null) {
+                xtbWriter = new XtbWriterEmpty(outputWriter, lang, messages);
+            } else {
+                xtbWriter = new XtbWriterAppend(outputWriter, lang, messages, translationContent);
+            }
+
+            xtbWriter.write();
+
+        } finally {
+            if (outputWriter != null) {
+                outputWriter.close();
+            }
         }
-
-        xtbWriter.write();
-        writer.close();
     }
 
     public Map<String, JsMessage> getMessages() throws IOException {
