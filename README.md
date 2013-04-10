@@ -72,7 +72,7 @@ More about google closure:
 - [Google closure compiler](https://developers.google.com/closure/compiler/)
 
 ## Download
-http:// TODO
+https://raw.github.com/kuzmisin/xtbgenerator/master/bin/XtbGenerator.jar
 
 ## TODO
 - add meaning into XTB file (depend on visibility of JsMessage.java::getMeaning)
