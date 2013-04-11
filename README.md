@@ -63,7 +63,7 @@ closurebuilder.py \
 	--compiler_flags="--lang=cs"
 ```
 
-You can find more about using ```closurebuilder.py``` on TODO
+You can find more about using ```closurebuilder.py``` on http://www.closurecheatsheet.com/skeleton
 
 ## Google closure
 
