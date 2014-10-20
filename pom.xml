@@ -74,7 +74,7 @@
         <dependency>
             <groupId>com.google.javascript</groupId>
             <artifactId>closure-compiler</artifactId>
-            <version>v20130227</version>
+            <version>LATEST</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
