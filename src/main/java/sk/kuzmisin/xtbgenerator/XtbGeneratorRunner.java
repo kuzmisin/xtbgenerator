@@ -1,11 +1,18 @@
 package sk.kuzmisin.xtbgenerator;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.google.javascript.jscomp.SourceFile;
 import org.apache.commons.cli.*;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class XtbGeneratorRunner {
 
@@ -17,6 +24,7 @@ class XtbGeneratorRunner {
         options.addOption("js", true, "Input JS file");
         options.addOption("translations_file", true, "XTB translation file");
         options.addOption("xtb_output_file", true, "XTB output file");
+        options.addOption("flagfile", true, "A file containing additional command-line options");
     }
 
     public static void main(String[] args) throws IOException {
@@ -47,6 +55,12 @@ class XtbGeneratorRunner {
             final String lang = line.getOptionValue("lang");
             final String translationFile = line.getOptionValue("translations_file");
             final String xtbOutputFile = line.getOptionValue("xtb_output_file");
+            final String flagFile = line.getOptionValue("flagfile");
+
+            if (flagFile != null)
+            {
+                processFlagFile(flagFile, jsFiles);
+            }
 
             if (lang == null) {
                 usage("lang cannot be empty");
@@ -63,6 +77,26 @@ class XtbGeneratorRunner {
         }
     }
 
+    private static void processFlagFile(String flagFile, Collection<SourceFile> jsFiles) throws IOException {
+
+        Path flagPath = Paths.get(flagFile);
+        BufferedReader buffer = java.nio.file.Files.newBufferedReader(flagPath, UTF_8);
+
+        String line;
+        Pattern pattern = Pattern.compile("^--([a-zA-Z_]+)\\s+(.*)$");
+
+        while ((line = buffer.readLine()) != null) {
+
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.matches() && matcher.group(1).equals("js"))
+            {
+                jsFiles.add(SourceFile.fromFile(matcher.group(2)));
+            }
+        }
+
+        buffer.close();
+    }
+
     protected static void usage(String errorMessage) {
         System.out.println("Usage: XtbGenerator --lang <arg> [--projectId <arg>] --js <FILE1> [--js <FILE2>]");
         System.out.println("or: XtbGenerator --lang <arg> [--projectId <arg>] FILE1 [FILE2]");
@@ -74,6 +108,7 @@ class XtbGeneratorRunner {
         System.out.println("\t--js\t\t\t: " + options.getOption("js").getDescription());
         System.out.println("\t--translations_file\t: " + options.getOption("translations_file").getDescription());
         System.out.println("\t--xtb_output_file\t: " + options.getOption("xtb_output_file").getDescription());
+        System.out.println("\t--flagfile\t\t: " + options.getOption("flagfile").getDescription());
 
         if (errorMessage != null) {
             System.out.println();
