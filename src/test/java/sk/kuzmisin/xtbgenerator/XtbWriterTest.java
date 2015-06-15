@@ -7,7 +7,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -28,7 +28,7 @@ public class XtbWriterTest {
 
     @Test
     public void testWriteMessages() throws Exception {
-        Map<String, JsMessage> messages = new HashMap<>();
+        Map<String, JsMessage> messages = new LinkedHashMap<>();
         GoogleJsMessageIdGenerator idGenerator = new GoogleJsMessageIdGenerator(null);
 
         messages.put(
