@@ -68,7 +68,7 @@ public class XtbWriterTest {
 
         final String expected =
                 "\t<translation id=\"2426017083238799036\" key=\"MSG_TEST_1\" source=\"file.js\" desc=\"Description 1\">Test 1</translation>\n" +
-                "\t<translation id=\"3160123618072793522\" key=\"MSG_TEST_2\" source=\"file.js\" desc=\"Description 2\">Test 2 <ph name=\"ph1\" /> continue message <ph name=\"ph2\" /></translation>\n" +
+                "\t<translation id=\"3160123618072793522\" key=\"MSG_TEST_2\" source=\"file.js\" desc=\"Description 2\">Test 2 <ph name=\"PH1\" /> continue message <ph name=\"PH2\" /></translation>\n" +
                 "\t<translation id=\"7594360968243980581\" key=\"MSG_TEST_3\" source=\"file.js\" desc=\"Description 3\">HTML &lt;&gt; &amp;</translation>\n";
 
         assertEquals(expected, writer.toString());
