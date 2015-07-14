@@ -1,5 +1,6 @@
 package sk.kuzmisin.xtbgenerator;
 
+import com.google.common.base.CaseFormat;
 import com.google.javascript.jscomp.JsMessage;
 
 import java.io.IOException;
@@ -46,7 +47,8 @@ abstract class XtbWriter {
 
             for (CharSequence part : message.parts()) {
                 if (part instanceof JsMessage.PlaceholderReference) {
-                    writer.append("<ph name=\"" + ((JsMessage.PlaceholderReference) part).getName() + "\" />");
+                    String name = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, ((JsMessage.PlaceholderReference) part).getName());
+                    writer.append("<ph name=\"" + name + "\" />");
                 } else {
                     writer.append(escape(part));
                 }

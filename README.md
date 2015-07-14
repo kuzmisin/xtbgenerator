@@ -3,11 +3,12 @@
 Generate/append XTB (translation XML file) for google closure compiler https://developers.google.com/closure/compiler/
 
 ## XTB file
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE translationbundle>
 <translationbundle lang="cs">
     <translation id="1234567890">Message ...</translation>
+    <translation id="1234567891">Message with <ph name="PLACE_HOLDER" />.</translation>
     ...
 </translationbundle>
 ```
@@ -16,6 +17,9 @@ Generate/append XTB (translation XML file) for google closure compiler https://d
 ```javascript
 /** @desc Description for Test 1 */
 var MSG_TEST_1 = goog.getMsg('Test 1');
+
+/** @desc Message with placeholder */
+var MSG_TEST_2 = goog.getMsg('Message with {$placeHolder}.', {placeHolder: 'replaced text'});
 ```
 
 ## Usage
