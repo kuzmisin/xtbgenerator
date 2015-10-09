@@ -69,6 +69,8 @@ abstract class XtbWriter {
     }
 
     protected String escapeDesc(CharSequence value) {
-        return value.toString().replace("\"", "&quot;");
+        return value.toString().
+            replace("&", "&amp;").
+            replace("\"", "&quot;");
     }
 }
