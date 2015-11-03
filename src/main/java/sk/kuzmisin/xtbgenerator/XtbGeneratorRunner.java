@@ -122,8 +122,8 @@ class XtbGeneratorRunner {
         System.out.println("\t--flagfile\t\t: " + options.getOption("flagfile").getDescription());
 
         if (errorMessage != null) {
-            System.out.println();
-            System.out.println("Error: " + errorMessage);
+            System.err.println();
+            System.err.println("Error: " + errorMessage);
         }
 
         System.exit(2);
