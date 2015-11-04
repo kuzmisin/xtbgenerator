@@ -34,7 +34,7 @@ class XtbGeneratorRunner {
         CommandLineParser parser = new GnuParser();
 
         try {
-            CommandLine line = parser.parse(options, args);
+            final CommandLine line = parser.parse(options, args);
 
             Collection<SourceFile> jsFiles = new ArrayList<>();
 
@@ -45,13 +45,8 @@ class XtbGeneratorRunner {
             final String[] jsFileArgs = line.getArgs();
 
             // expand globs in input file paths
-            List<String> jsFileNames = getJsFiles(
-                    Arrays.asList(jsFileOptions),
-                    Arrays.asList(jsFileArgs)
-            );
-
-            for (String jsFile : jsFileNames)
-            {
+            final List<String> jsFileNames = getJsFiles(jsFileOptions, jsFileArgs);
+            for (String jsFile : jsFileNames) {
                 jsFiles.add(SourceFile.fromFile(jsFile));
             }
 
@@ -61,8 +56,7 @@ class XtbGeneratorRunner {
             final String xtbOutputFile = line.getOptionValue("xtb_output_file");
             final String flagFile = line.getOptionValue("flagfile");
 
-            if (flagFile != null)
-            {
+            if (flagFile != null) {
                 processFlagFile(flagFile, jsFiles);
             }
 
@@ -81,15 +75,18 @@ class XtbGeneratorRunner {
         }
     }
 
-    private static List<String> getJsFiles(List<String> js, List<String> arguments) throws IOException {
-        List<String> patterns = new ArrayList<>();
-        patterns.addAll(js);
-        patterns.addAll(arguments);
+    private static List<String> getJsFiles(String[] ...arrays) throws IOException {
+        final List<String> patterns = new ArrayList<>();
+        for (String[] array: arrays) {
+            if (array != null && array.length > 0) {
+                patterns.addAll(Arrays.asList(array));
+            }
+        }
+
         return CommandLineRunner.findJsFiles(patterns);
     }
 
     private static void processFlagFile(String flagFile, Collection<SourceFile> jsFiles) throws IOException {
-
         Path flagPath = Paths.get(flagFile);
         BufferedReader buffer = java.nio.file.Files.newBufferedReader(flagPath, UTF_8);
 
