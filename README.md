@@ -30,7 +30,7 @@ or: XtbGenerator --lang <arg> [--projectId <arg>] FILE1 [FILE2]
 Params:
     --lang          : Lang
     --projectId     : Project ID
-    --js            : Input JS file
+    --js            : Input JS file, possibly with * or ** wildcards for glob search
     --translations_file : XTB translation file
     --xtb_output_file   : XTB output file
 ```
@@ -52,6 +52,8 @@ java -jar XtbGenerator.jar \
 	--xtb_output_file messages.xtb \
 	--js messages.js
 ```
+
+You may also use minimatch-style glob patterns for input files. For example, use `--js='**.js' --js='!**_test.js'` to recursively include all js files that do not end in _test.js
 
 ## Usage with closurebuilder.py
 ```

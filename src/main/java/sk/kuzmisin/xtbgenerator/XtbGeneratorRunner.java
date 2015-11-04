@@ -2,6 +2,7 @@ package sk.kuzmisin.xtbgenerator;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.javascript.jscomp.CommandLineRunner;
 import com.google.javascript.jscomp.SourceFile;
 import org.apache.commons.cli.*;
 
@@ -10,7 +11,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,7 +24,7 @@ class XtbGeneratorRunner {
     static {
         options.addOption("projectId", true, "Project ID");
         options.addOption("lang", true, "Lang");
-        options.addOption("js", true, "Input JS file");
+        options.addOption("js", true, "Input JS file, possibly with * or ** wildcards for glob search");
         options.addOption("translations_file", true, "XTB translation file");
         options.addOption("xtb_output_file", true, "XTB output file");
         options.addOption("flagfile", true, "A file containing additional command-line options");
@@ -37,18 +40,19 @@ class XtbGeneratorRunner {
 
             // JS files from CLI option --js
             final String[] jsFileOptions = line.getOptionValues("js");
-            if (jsFileOptions != null) {
-                for (int i = 0; i < jsFileOptions.length; i++) {
-                    jsFiles.add(SourceFile.fromFile(jsFileOptions[i]));
-                }
-            }
 
             // JS files from CLI arguments
             final String[] jsFileArgs = line.getArgs();
-            if (jsFileArgs != null) {
-                for (int i = 0; i < jsFileArgs.length; i++) {
-                    jsFiles.add(SourceFile.fromFile(jsFileArgs[i]));
-                }
+
+            // expand globs in input file paths
+            List<String> jsFileNames = getJsFiles(
+                    Arrays.asList(jsFileOptions),
+                    Arrays.asList(jsFileArgs)
+            );
+
+            for (String jsFile : jsFileNames)
+            {
+                jsFiles.add(SourceFile.fromFile(jsFile));
             }
 
             final String projectId = line.getOptionValue("projectId");
@@ -75,6 +79,13 @@ class XtbGeneratorRunner {
         } catch (ParseException e) {
             usage(e.getMessage());
         }
+    }
+
+    private static List<String> getJsFiles(List<String> js, List<String> arguments) throws IOException {
+        List<String> patterns = new ArrayList<>();
+        patterns.addAll(js);
+        patterns.addAll(arguments);
+        return CommandLineRunner.findJsFiles(patterns);
     }
 
     private static void processFlagFile(String flagFile, Collection<SourceFile> jsFiles) throws IOException {
@@ -111,8 +122,8 @@ class XtbGeneratorRunner {
         System.out.println("\t--flagfile\t\t: " + options.getOption("flagfile").getDescription());
 
         if (errorMessage != null) {
-            System.out.println();
-            System.out.println("Error: " + errorMessage);
+            System.err.println();
+            System.err.println("Error: " + errorMessage);
         }
 
         System.exit(2);
